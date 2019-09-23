@@ -1,0 +1,34 @@
+2019.9.23  linux主机搭建细节
+
+1.go语言安装配置：https://blog.csdn.net/bawenmao/article/details/80217055
+2.mysql的配置：https://www.jianshu.com/p/581aab472752  //可以先不配置
+3.reddis的安装：https://redis.io/download
+4.reddis的一些操作：
+	set key value 设置一个键值对
+	expire key int  让这个键在数据库中存活int的时间
+	redis中 List的操作：
+		Rpush list value 往list最后面面放一个值
+		Lpush list value 往list最前面放一个值
+		Lrange list start end  查询list中这个区间段
+		LLEN 查询list长度
+		LPOP 弹出开头的一个
+		RPOP 弹出末尾的一个
+
+	redis中 set的操作：
+		SADD adds the given value to the set.
+		SREM removes the given value from the set.
+		SISMEMBER tests if the given value is in the set. It returns 1 if the value is there and 0 if it is not.
+		SMEMBERS returns a list of all the members of this set.
+		SUNION combines two or more sets and returns the list of all elements.
+
+		对于set而言，其本身性质属于无顺序的类型 当我们想要对其排序就需要用以下形式来进行添加：
+		https://www.runoob.com/redis/redis-sorted-sets.html
+
+	redis中 Hahses的操作：
+		Hset key name value  设置一个字段
+		Hmset key name1 value1 name2 value2 name3 value3...  一次性设置多个字段
+		Hget key name 获取一个字段
+		Hgetall key 过去这个key对应所有字段信息
+5.reddis在go中使用的驱动：需要git  https://github.com/gomodule/redigo
+	首先要在linux上下载相应支持： go get github.com/garyburd/redigo/redis
+	然后在程序中调用即可
