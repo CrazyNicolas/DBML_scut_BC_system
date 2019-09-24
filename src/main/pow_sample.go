@@ -35,6 +35,7 @@ func (p *Pow) PrepareData(nonce int64) []byte {
 			p.Cur_block.Data,
 			Int64ToBytes(nonce),
 			Int64ToBytes(p.Cur_block.Timestamp),
+			//这个其实就是困难度
 			Int64ToBytes(int64(target_bit)),
 			Int64ToBytes(p.Cur_block.Height),
 		}, []byte{})
