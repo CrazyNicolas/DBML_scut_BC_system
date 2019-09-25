@@ -1,0 +1,7 @@
+Sep 25th:
+    mingze Sun: The implementation and detail of PBFT need to be understood
+    zeyuan Ma: golang Coding:
+                    1.generate private/public key
+                    2.rpc sending and response operation
+                    3.defining all the messages in PBFT as a struct
+                    4.using sha256 to digest the transaction
