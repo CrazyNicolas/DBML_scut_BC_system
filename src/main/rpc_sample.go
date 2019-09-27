@@ -86,5 +86,5 @@ func Test(t int64, port string, target string) {
 func main() {
 	go Test(100, "10000", "127.0.0.1:10001")
 	go Test(200, "10001", "127.0.0.1:10000")
-	time.Sleep(time.Second * 20)
+
 }
