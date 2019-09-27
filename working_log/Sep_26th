@@ -1,3 +1,9 @@
 zeyuan Ma:
     1.update the rpc invocation in the rpc_sample.go
     2.update rsa_utils.go with the publickey and privatekey generator and getter
+mingze Sun:
+    1.summarize again the PBFT process, solve the problem (why the prepare and the commit process are so same)
+        reason is (1) the prepare process is, as a node visual angle, this system is reliable.
+        another reason is (2) the commit process is, as system visual angle, this system possesses enough nodes trustworthy.
+    2.find out what concrete function invoked in every process and what structure is in every process
+    3.another thing is to be done, draw a concrete process model picture in every process.
