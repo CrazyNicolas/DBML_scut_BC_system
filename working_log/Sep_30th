@@ -1,0 +1,8 @@
+today we discuss a main idea about how to use theories to compare traditional ML and our
+DBML:
+    1.how to use rpcx to efficiently implement complex communication within a bc system
+    2.How those advanced computation(matrix , differential , gradient , for-loop ,..) are implemented by cpu and other compositions in computer
+    3.In a complex network , how to estimate the communication cost under the given structure , especially
+    we prefer to take the network as a blackbox and consider the duration between some transaction get in and get out.
+    4.tensorflow's way to calculate for those advanced computation
+    5.How to analyse the ability of cpu using its technical parameters
