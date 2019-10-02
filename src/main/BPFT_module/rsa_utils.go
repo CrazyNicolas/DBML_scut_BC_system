@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -38,8 +40,8 @@ func GenerateRsaKeyPair(bits int) {
 	pem.Encode(publicKeyFile, &publicKeyBlock)
 }
 
-func GetPrivateKey() *rsa.PrivateKey {
-	file, err := os.Open("private.pem")
+func GetPrivateKey(path string) *rsa.PrivateKey {
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
@@ -54,8 +56,8 @@ func GetPrivateKey() *rsa.PrivateKey {
 	return privatekey
 }
 
-func GetPublicKey() *rsa.PublicKey {
-	file, err := os.Open("public.pem")
+func GetPublicKey(path string) *rsa.PublicKey {
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
@@ -70,11 +72,38 @@ func GetPublicKey() *rsa.PublicKey {
 	return publickey
 }
 
-func DigitalSignature() {
+func DigitalSignature(message []byte, path string) []byte {
+	//从密钥文件里面把私钥拿到
+	privatekey := GetPrivateKey(path)
+	hash := sha256.New()
+	hash.Write(message)
+	digest := hash.Sum(nil)
 
+	digital_signature, err := rsa.SignPKCS1v15(rand.Reader, privatekey, crypto.SHA256, digest)
+	if err != nil {
+		fmt.Println("Signing err: ", err)
+		panic(err)
+	}
+	return digital_signature
+}
+
+func Verify_ds(signature []byte, path string, message []byte) bool {
+	publickey := GetPublicKey(path)
+	hash := sha256.New()
+	hash.Write(message)
+	//生成摘要待查验
+	digest := hash.Sum(nil)
+	//将摘要和数字签名公钥解析后的对比
+	err := rsa.VerifyPKCS1v15(publickey, crypto.SHA256, digest, signature)
+	return err == nil
 }
 
 func main() {
 	//调用生成密钥对
-	GenerateRsaKeyPair(2048)
+	//GenerateRsaKeyPair(2048)
+	//调用签名函数进行签名
+	signature := DigitalSignature([]byte("Helloworld"), "private.pem")
+	//调用验证函数来验证摘要
+	fmt.Println(Verify_ds(signature, "public.pem", []byte("helloworld")))
+
 }

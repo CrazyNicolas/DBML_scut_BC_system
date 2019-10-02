@@ -129,3 +129,26 @@ func (srv *Server) Serve(l net.Listener) error {
 5.reddis在go中使用的驱动：需要git  https://github.com/gomodule/redigo
 	首先要在linux上下载相应支持： go get github.com/garyburd/redigo/redis
 	然后在程序中调用即可
+
+Sep 30th
+    1.有几个之前的技术概念，都是用来将机器学习并行化运行的：
+        1.cyclic delay:
+            从 Slow learners are fast这篇文章中得知一下知识点：
+                online learning是一个很好的概念但是目前的情况是，硬盘存储的读写速度跟不上cpu处理器的处理速度，
+                并且大部分的学习过程都是基于串行的，使得多核cpu的工作模式没有被完全利用
+        构造一种有延迟的模型，将复杂函数分为n个节点，分别进行运算，再把结果放在一起，使得针对于每个节点来说
+        其实计算梯度都是在本地完成的。
+
+    2.关于rpc的一些知识：
+        A.rpc的大致过程
+            1.	client调用client	stub，这是一次本地过程调用
+            2.	client	stub将参数打包成一个消息，然后发送这个消息。打包过程也叫做	marshalling
+            3.	client所在的系统将消息发送给server
+            4.	server的的系统将收到的包传给server	stub
+            5.	server	stub解包得到参数。	解包也被称作	unmarshalling
+            6.	最后server	stub调用服务过程.	返回结果按照相反的步骤传给client
+        B.rpcx框架:
+            是一个分布式的Go语言的	RPC	框架，支持 Zookepper、etcd、consul多种服务发现方式，
+            多种服务路由方式,是目前性能最好的	RPC	框架之一。
+            服务器rpcx的起步配置
+

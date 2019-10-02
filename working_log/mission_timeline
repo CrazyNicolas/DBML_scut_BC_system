@@ -5,3 +5,14 @@ Sep 25th:
                     2.rpc sending and response operation
                     3.defining all the messages in PBFT as a struct
                     4.using sha256 to digest the transaction
+Sep 27th:
+    mingze Sun:
+        1.PBFT coding(10.5)
+        2.Biscotti Writting style(10.3)
+    zeyuan Ma:
+        1.paper structure to be done(10.3)
+        2.sharding theory (10.5)
+    sheng Jiang:
+        1.two papers （ddl: 10.3）
+        2.go programming
+        3.python rpc (10.5)
