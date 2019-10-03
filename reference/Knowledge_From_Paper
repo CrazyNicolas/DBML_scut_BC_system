@@ -152,3 +152,81 @@ Sep 30th
             多种服务路由方式,是目前性能最好的	RPC	框架之一。
             服务器rpcx的起步配置
 
+Oct 3rd
+    federated machine learning摘要
+    1.fed learning的保障隐私的三种技术：
+        (1)SMC，安全多方计算，跟零知识证明的概念比较类似，在不涉及隐私数据的前提下实现安全的不依赖于第三方的计算。
+        (2)Differential Privacy，差分隐私。简单来说就是在数据集中加入噪声，使得对于任意两份查询结果是接近于不可区分的。
+        使确定的输出结构以概率的方式呈现，可以理解为以一定的概率说假话，需要从精确度和隐私性之间做权衡。
+        (3)Homomorphic Encryption，同态加密。就是可以从密文信息中得到一些有用的信息，但是原文的敏感信息被隐藏起来。目前
+        还在理论阶段。
+    2.fed learning的三种结构：
+        (1)Horizontal fed learning。数据集的特征空间相同，但是不同数据集的交集很小。
+        (2)Vertical fed learning。不同数据集有很大一部分是来自于同一批样本的，但是特征空间不相同。
+        (3)fed transfer learning。不仅不同数据集的交集很小，而且特征空间也不相同。它是对现存的fed learning系统的推广。
+    3.具体步骤
+        (1)Horizontal
+        1.节点在本地计算完梯度后，用一些技术例如加密、差分隐私或者秘密共享等等掩盖梯度信息，然后把结果发给server。
+        2.server将收到的信息聚合起来。
+        3.server将处理过的结果发送给各个节点。
+        4.节点将收到的结果解密后在本地进行梯度更新。
+
+        (2)Vertical
+        企业A、B需要共同训练一份模型，B同时拥有该模型需要预测的标签数据。C是它们的合作者。
+        1.C生成密钥对，把公钥发送给A和B。
+        2.A和B得到本地的梯度和损失函数后，对它们进行加密，然后交换。
+        3.A和B对收到的加密梯度值进行计算，然后再对结果进行隐私处理(mask)；B同时还需要计算损失函数。最后A、B把加密数据发送给C。
+        4.C解密后将梯度值和损失函数值发送给A和B，A和B收到后对这些值进行处理(unmask)，然后在本地进行参数更新。
+    4.其他
+        1.以上结构不仅考虑到了隐私信息的保护，还使得贡献较多数据的节点能够获得奖励，实现了激励机制。
+        2.federated learning和distributed learning的区别在于在后者中，存在一个parameter server存储数据，分配数据和计算资源
+        到各个工作节点上，即这些节点要受到中央节点的管控。但是fed learning中每个节点对自己的数据拥有绝对的管理权，因此更加复杂。
+        而且，fed learning更加强调隐私性。
+
+    python grpc：
+        1.在.proto文件中第一句话写上syntax = "proto3",然后定义消息类型，它是一种数据结构，例如定义一个Number消息
+        message Number {
+            float value = 1;
+        }
+        指明了value的类型为浮点数，1是它在消息中的序号。如果还要加其他属性，可以=2，=3这样下去。可以定义多个消息和服务。
+        然后定义服务，
+        service Calculate {
+            rpc Square(Number) returns (Number) {}
+        }
+        这是最简单的一种函数，客户端传Number消息，服务端返回Number消息。
+        还有其他类型的函数，
+            rpc Square(stream Number) returns (Number) {}，输入为Number流，返回单个Number
+            rpc Square(Number) returns (stream Number) {}，输入为单个Number，返回Number流
+            rpc Square(stream Number) returns (stream Number) {}，输入和返回都是Number流
+        至此最简单的proto文件已经生成，一般将proto文件放在protos目录下。在上层目录控制台下输入
+        python -m grpc_tools.protoc -I./protos --python_out=. --grpc_python_out=. ./protos/calculate.proto
+        -I参数后面是proto文件所在的目录，--python_out和--grpc_python_out指定生成的模板文件存放在哪里，一般指定为.即可。
+        最后加上proto文件的路径。
+        然后会自动生成caculate_pb2.py和caculate_pb2_grpc.py文件，不用对他们进行修改。
+
+        2.编写client代码
+        将自动生成的两个模板文件import进来，然后定义一个run函数，
+        def run():
+            with grpc.insecure_channel('localhost:7777') as channel:
+                stub = calculate_pb2_grpc.CalculateStub(channel)
+                for _ in range(10):
+                    i = calculate_pb2.Number(value=random.random()*10)
+                    print(stub.Square(i).value)
+        通过channel连接上服务器地址，然后通过calculate_pb2_grpc中的相应方法生成Stub本地类，这个类拥有在proto文件中定义的
+        函数Square。
+
+        3.编写server代码
+        首先需要从calculate_pb2_grpc中继承类calculate_pb2_grpc.CalculateServicer
+        class CaculateServicer(calculate_pb2_grpc.CalculateServicer):
+            def Square(self, request, context):
+                return calculate_pb2.Number(value=pow(request.value, 2))
+        在这个类中实现proto文件中定义的服务函数。
+        def server():
+            server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+            calculate_pb2_grpc.add_CalculateServicer_to_server(
+                CaculateServicer(), server
+            )
+            server.add_insecure_port("[::]:7777")
+            server.start()
+            server.wait_for_termination()
+        这段代码开启服务
