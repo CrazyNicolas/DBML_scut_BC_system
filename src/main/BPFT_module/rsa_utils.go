@@ -6,6 +6,7 @@ import (
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"os"
@@ -72,12 +73,15 @@ func GetPublicKey(path string) *rsa.PublicKey {
 	return publickey
 }
 
-func DigitalSignature(message []byte, path string) []byte {
+func DigitalSignature(message interface{}, path string) []byte {
 	//从密钥文件里面把私钥拿到
+
 	privatekey := GetPrivateKey(path)
-	hash := sha256.New()
-	hash.Write(message)
-	digest := hash.Sum(nil)
+	//hash := sha256.New()
+	//hash.Write(message)
+	//digest := hash.Sum(nil)
+
+	digest := Digest(message)
 
 	digital_signature, err := rsa.SignPKCS1v15(rand.Reader, privatekey, crypto.SHA256, digest)
 	if err != nil {
@@ -85,6 +89,14 @@ func DigitalSignature(message []byte, path string) []byte {
 		panic(err)
 	}
 	return digital_signature
+}
+
+func Digest(message interface{}) []byte {
+	msg, _ := json.Marshal(message)
+	hash := sha256.New()
+	hash.Write(msg)
+	digest := hash.Sum(nil)
+	return digest
 }
 
 func Verify_ds(signature []byte, path string, message []byte) bool {
