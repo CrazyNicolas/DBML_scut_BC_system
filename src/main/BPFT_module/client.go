@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rsa"
 	"crypto/sha256"
+	"encoding/json"
 	"github.com/smallnest/rpcx/client"
 	"github.com/smallnest/rpcx/server"
 	"golang.org/x/net/html/atom"
@@ -25,21 +26,17 @@ type Request_Args struct {
 	Timestamp int64
 	//客户端标识
 	Publickey *rsa.PublicKey
-	Msg       string
-	digest    [32]byte
 }
 
 type Request_Reply struct {
 }
 
-func Request(operation string, msg string) {
+func Request(operation string) {
 	args := &Request_Args{operation,
 		time.Now().Unix(),
 		GetPublicKey("public.pem"),
-		msg,
-		sha256.Sum256([]byte(msg))}
-
-	// 这里去远程调用Primary的接受Request请求的函数
+	}
+	// TODO 这里应该首先获得主节点的地址，并调用它的那个接收函数
 
 }
 
@@ -52,18 +49,4 @@ func (t *Client) Get_Reply(ctx context.Context, args *Reply_Args, reply *Reply_R
 }
 
 func main() {
-	//首先获取注册中心找到primary地址
-	d := GetRegisterDir()
-	//找到primary
-	//构建一个RequestArgs, 调用Request方法, Request方法是去调用一个接收参数的函数
-
-	Request("", "")
-
-	s := server.NewServer()
-	err := s.RegisterName("GetReply", new(Client), "")
-	if err != nil {
-		print(err)
-	}
-	s.Serve("tcp", ":8972")
-
 }

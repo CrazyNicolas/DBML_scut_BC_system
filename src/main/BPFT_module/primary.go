@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 )
 
 /**
@@ -20,41 +21,41 @@ import (
 */
 
 type Primary struct {
-	serialNumber int
-	viewNumber   int
+	Replica
+	n int32
 }
 
 /**
 1. 接受从client来的Request请求的参数（即为远程服务）
 */
-func (t *Primary) Get_Request(ctx context.Context, args Request_Args, reply *Request_Reply) error {
-	// TODO 对客户端的请求进行校验
-	// 请求消息签名是否正确
-	// 若校验成功
-	Pre_prepare(args.Msg, args.digest)
+func (pri *Primary) Get_Request(ctx context.Context, args Request_Args, signature []byte, reply *Request_Reply) error {
+	// 对客户端的请求进行校验
+	bytes, _ := json.Marshal(args)
+	if Verify_ds(signature, "public.pem", bytes) {
+		pri.Pre_prepare(args, Digest(args))
+	}
 	return nil
 }
 
 type Pre_prepare_Args struct {
-	viewNumber   int
-	digest       [32]byte
-	Msg          string
-	serialNumber int
+	viewNumber int32
+	digest     []byte
+	n          int32
 }
 
 type Pre_prepare_Reply struct {
 }
 
-func Pre_prepare(message string, digest [32]byte) {
-	// TODO (1) 分配一个编号(这里面编号的逻辑并没有完成)
+func (pri *Primary) Pre_prepare(request Request_Args, digest []byte) {
+	// 分配一个编号(这里面编号的逻辑并没有完成)
 	args := Pre_prepare_Args{
-		viewNumber:   0,
-		digest:       digest,
-		Msg:          message,
-		serialNumber: 0,
+		viewNumber: pri.viewNumber,
+		digest:     digest,
+		n:          pri.n,
 	}
-
+	pri.n++
 	// TODO 这里要广播
+
 }
 
 /**

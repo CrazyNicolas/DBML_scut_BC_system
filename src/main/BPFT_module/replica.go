@@ -1,6 +1,9 @@
 package main
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+)
 
 /**
   副本节点replica有以下几个流程：
@@ -18,18 +21,38 @@ import "context"
 */
 
 type Replica struct {
-	serialNumber int
-	viewNumber   int
+	serialNumber int32
+	viewNumber   int32
+	h            int32
+	H            int32
 }
 
 /**
 1. 接受从Primary来的pre-prepare()参数（即为远程服务）
 */
-func (t *Replica) Get_Pre_prepare(ctx context.Context, args *Pre_prepare_Args, reply *Pre_prepare_Reply) error {
-	// TODO 对Primary的pre-prepare()请求进行校验
-	// （1）查看请求的签名是否正确
-	//  (2)
+func (t *Replica) Get_Pre_prepare(ctx context.Context, args *Pre_prepare_Args, signature []byte, message Request_Args, reply *Pre_prepare_Reply) error {
+	// 对Primary的pre-prepare()请求进行校验
+	// （1）判断d和m是否一致
+	digest := Digest(message)
+	if digest != args.digest {
+		return nil
+	}
+	//  (2)判断
+	bytes, _ := json.Marshal(args)
+	if !Verify_ds(signature, "public.pem", bytes) {
+		return nil
+	}
+	//(3)查看当前view是否与pre-prepare中的view相同
+	if t.viewNumber != args.viewNumber {
+		return nil
+	}
+	//(4)TODO：查看当前replica是否接受过一个v,n相同但是d不同的pre-prepare请求
+	//(5)判断水线
+	if !(args.n < t.H && args.n > t.h) {
+		return nil
+	}
 
+	//TODO: 广播prepare消息
 	return nil
 }
 
@@ -37,14 +60,25 @@ func (t *Replica) Get_Pre_prepare(ctx context.Context, args *Pre_prepare_Args, r
 2. prepare()方法
 */
 type Prepare_Args struct {
+	serialNumber int32
+	viewNumber   int32
+	n            int32
+	digest       []byte
 }
 
 type Prepare_Reply struct {
 }
 
-func Prepare() {
-	// TODO 这里要根据Prepare_Args的参数来指定具体参数
+func (rep *Replica) Prepare(n int32, digest []byte) {
+	args := Prepare_Args{
+		serialNumber: rep.serialNumber,
+		viewNumber:   rep.viewNumber,
+		n:            n,
+		digest:       digest,
+	}
 	// TODO 这里要广播所有节点发送prepare的参数
+	//TODO 记录到log
+
 }
 
 /**
