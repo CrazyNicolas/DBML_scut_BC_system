@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/rsa"
 	"encoding/json"
 )
 
@@ -28,40 +29,21 @@ type Primary struct {
 /**
 1. 接受从client来的Request请求的参数（即为远程服务）
 */
-func (pri *Primary) Get_Request(ctx context.Context, args Request_Args, signature []byte, reply *Request_Reply) error {
-	// 对客户端的请求进行校验
-	bytes, _ := json.Marshal(args)
-	if Verify_ds(signature, "public.pem", bytes) {
-		pri.Pre_prepare(args, Digest(args))
-	}
+func (pri *Primary) Get_Request(ctx context.Context, args Request_Msg, reply interface{}) error {
+	// TODO 对客户端的请求进行校验
 	return nil
 }
 
-type Pre_prepare_Args struct {
-	viewNumber int32
-	digest     []byte
-	n          int32
-}
-
-type Pre_prepare_Reply struct {
-}
-
-func (pri *Primary) Pre_prepare(request Request_Args, digest []byte) {
-	// 分配一个编号(这里面编号的逻辑并没有完成)
-	args := Pre_prepare_Args{
-		viewNumber: pri.viewNumber,
-		digest:     digest,
-		n:          pri.n,
-	}
-	pri.n++
-	// TODO 这里要广播
+func (pri *Primary) Pre_prepare(request Request_Msg, private *rsa.PrivateKey) {
+	// TODO 分配一个编号(这里面编号的逻辑并没有完成)
+	args := NewPreprepare(pri.n, pri.viewNumber, request.request, private)
 
 }
 
 /**
 2. 接受从其他Replica发来的prepare（）参数（即为远程服务）
 */
-func (t *Primary) Primary_Get_Prepare(ctx context.Context, args *Prepare_Args, reply *Prepare_Reply) error {
+func (t *Primary) Primary_Get_Prepare(ctx context.Context, args *Prepare_Msg, reply *interface{}) error {
 	// TODO 这里面写处理Prepare()的逻辑，如果正确的话执行commit()
 	return nil
 }
@@ -69,11 +51,16 @@ func (t *Primary) Primary_Get_Prepare(ctx context.Context, args *Prepare_Args, r
 /*
 	3. 这里面应该有一个Commit方法，但是这个方法是可以通用的，不写。
 */
+func (rep *Primary) Commit(n int32, digest []byte, private *rsa.PrivateKey) {
+	// TODO 这里要根据Commit_Args的参数来指定具体参数
+	// TODO 这里要广播所有节点发送commit的参数
+	args := NewCommit(n, rep.viewNumber, rep.serialNumber, digest, private)
+}
 
 /**
 4. 接受从其他节点发来的Commit（）参数（即为远程服务）
 */
-func (t *Primary) Primary_Get_Commit(ctx context.Context, args *Commit_Args, reply *Commit_Reply) error {
+func (t *Primary) Primary_Get_Commit(ctx context.Context, args *Commit_Msg, reply *interface{}) error {
 	// TODO 这里面写处理Commit()的逻辑，如果正确的话执行Reply()
 	return nil
 }

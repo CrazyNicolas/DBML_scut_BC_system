@@ -73,10 +73,9 @@ func GetPublicKey(path string) *rsa.PublicKey {
 	return publickey
 }
 
-func DigitalSignature(message interface{}, path string) []byte {
+func DigitalSignature(message interface{}, privatekey *rsa.PrivateKey) []byte {
 	//从密钥文件里面把私钥拿到
 
-	privatekey := GetPrivateKey(path)
 	//hash := sha256.New()
 	//hash.Write(message)
 	//digest := hash.Sum(nil)

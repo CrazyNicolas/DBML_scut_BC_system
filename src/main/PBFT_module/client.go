@@ -21,22 +21,9 @@ import (
 type Client struct {
 }
 
-type Request_Args struct {
-	Operation string
-	Timestamp int64
-	//客户端标识
-	Publickey *rsa.PublicKey
-}
-
-type Request_Reply struct {
-}
-
-func Request(operation string) {
-	args := &Request_Args{operation,
-		time.Now().Unix(),
-		GetPublicKey("public.pem"),
-	}
+func Request(operation string, pub *rsa.PublicKey, pri *rsa.PrivateKey) {
 	// TODO 这里应该首先获得主节点的地址，并调用它的那个接收函数
+	msg := NewRequest(operation, time.Now().UnixNano(), pub, pri)
 
 }
 
