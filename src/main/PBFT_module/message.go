@@ -25,12 +25,18 @@ type preprepare struct {
 	digest []byte //消息摘要d
 }
 
+/**
+
+ */
 type Prepreprare_Msg struct {
 	preprepare preprepare //preprepare本身
 	request    request    //request本身
 	signature  []byte     //签名
 }
 
+/**
+
+ */
 func NewPreprepare(n, v int32, req request, pri *rsa.PrivateKey) Prepreprare_Msg {
 	prepre := preprepare{n, v, Digest(req)}
 	sig := DigitalSignature(prepre, pri)
