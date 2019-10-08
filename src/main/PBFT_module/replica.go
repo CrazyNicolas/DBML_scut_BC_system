@@ -71,6 +71,9 @@ func (rep *Replica) Prepare(n int32, digest []byte, private *rsa.PrivateKey) {
 */
 func (t *Replica) Replica_Get_Prepare(ctx context.Context, args *Prepare_Msg, reply *interface{}) error {
 	// TODO 这里面写处理Prepare()的逻辑，如果正确的话执行commit()
+	/*
+		这部分
+	*/
 	return nil
 }
 
