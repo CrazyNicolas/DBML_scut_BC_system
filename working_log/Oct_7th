@@ -1,0 +1,29 @@
+misson:
+    ddl : oct_13th
+    工作之前先更新自己的git
+    分工：
+        1.broadcast_utils.go 由mzy负责封装函数 ， 参数有 js smz提供
+        2.view_change 和 GC --->mzy
+        3.client.go:
+            a:main函数里面的架构 ----> mzy
+            b: js:
+                Get_Request()
+                Pre_prepare()
+                Primary_Get_Prepare()
+                Commit()
+                Primary_Get_Commit()
+                Reply()
+
+                smz:
+                以上函数的参数部分
+            c: smz:
+                Request()
+                Get_Reply()
+                Get_Pre_Prepare()
+                Prepare()
+                Replica_Get_Prepare()
+                Replica_Get_Commit()
+
+              js:
+                以上函数的参数部分
+
