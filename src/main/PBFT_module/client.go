@@ -1,15 +1,4 @@
-package main
-
-import (
-	"context"
-	"crypto/rsa"
-	"crypto/sha256"
-	"encoding/json"
-	"github.com/smallnest/rpcx/client"
-	"github.com/smallnest/rpcx/server"
-	"golang.org/x/net/html/atom"
-	"time"
-)
+package PBFT_module
 
 /**
  client 有以下几个流程：
@@ -21,19 +10,16 @@ import (
 type Client struct {
 }
 
-func Request(operation string, pub *rsa.PublicKey, pri *rsa.PrivateKey) {
-	// TODO 这里应该首先获得主节点的地址，并调用它的那个接收函数
-	msg := NewRequest(operation, time.Now().UnixNano(), pub, pri)
-
-}
+//func Request(operation string, pub *rsa.PublicKey, pri *rsa.PrivateKey) {
+//	// TODO 这里应该首先获得主节点的地址，并调用它的那个接收函数
+//	msg := NewRequest(operation, time.Now().UnixNano(), pub, pri)
+//
+//}
 
 /**
 4. 接受从其他节点发来的Commit（）参数（即为远程服务）
 */
-func (t *Client) Get_Reply(ctx context.Context, args *Reply_Args, reply *Reply_Reply) error {
-	// TODO 这里面写处理Reply()的逻辑
-	return nil
-}
-
-func main() {
-}
+//func (t *Client) Get_Reply(ctx context.Context, args *Reply_Args, reply *Reply_Reply) error {
+//	// TODO 这里面写处理Reply()的逻辑
+//	return nil
+//}

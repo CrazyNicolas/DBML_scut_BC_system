@@ -1,4 +1,4 @@
-package main
+package PBFT_module
 
 import "crypto/rsa"
 
@@ -20,8 +20,8 @@ func NewRequest(op string, t int64, pub *rsa.PublicKey, pri *rsa.PrivateKey) Req
 }
 
 type preprepare struct {
-	n      int32  //主节点分配的序号n
 	v      int32  //视图编号v
+	n      int32  //主节点分配的序号n
 	digest []byte //消息摘要d
 }
 
@@ -37,8 +37,8 @@ type Prepreprare_Msg struct {
 /**
 
  */
-func NewPreprepare(n, v int32, req request, pri *rsa.PrivateKey) Prepreprare_Msg {
-	prepre := preprepare{n, v, Digest(req)}
+func NewPreprepare(v, n int32, req request, pri *rsa.PrivateKey) Prepreprare_Msg {
+	prepre := preprepare{v, n, Digest(req)}
 	sig := DigitalSignature(prepre, pri)
 	return Prepreprare_Msg{prepre, req, sig}
 }

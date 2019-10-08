@@ -1,4 +1,4 @@
-package main
+package PBFT_module
 
 import (
 	"crypto"
@@ -107,14 +107,4 @@ func Verify_ds(signature []byte, path string, message []byte) bool {
 	//将摘要和数字签名公钥解析后的对比
 	err := rsa.VerifyPKCS1v15(publickey, crypto.SHA256, digest, signature)
 	return err == nil
-}
-
-func main() {
-	//调用生成密钥对
-	//GenerateRsaKeyPair(2048)
-	//调用签名函数进行签名
-	signature := DigitalSignature([]byte("Helloworld"), "private.pem")
-	//调用验证函数来验证摘要
-	fmt.Println(Verify_ds(signature, "public.pem", []byte("helloworld")))
-
 }
