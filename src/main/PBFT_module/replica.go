@@ -50,7 +50,7 @@ func NewReplica(i, v, h, H int32) Replica {
 			"n int," +
 			"d varchar(50)," +
 			"i int," +
-			"m text);")
+			"m json);")
 		if err != nil {
 			fmt.Println("数据表创建失败", err)
 		}
