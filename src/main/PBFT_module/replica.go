@@ -51,13 +51,6 @@ func NewReplica(i, v, h, H int32) Replica {
 			"d varchar(50)," +
 			"i int," +
 			"m text);")
-		fmt.Println("create table replica" + ToString(i) + " (" +
-			"type enum('PRE-PREPARE', 'PREPARE', 'COMMIT')," +
-			"v int," +
-			"n int," +
-			"d varchar(50)," +
-			"i int," +
-			"m text);")
 		if err != nil {
 			fmt.Println("数据表创建失败", err)
 		}

@@ -9,8 +9,8 @@ type request struct {
 }
 
 type Request_Msg struct {
-	request   request //request本身
-	signature []byte  //签名
+	request          //request本身
+	signature []byte //签名
 }
 
 func NewRequest(op string, t int64, pub *rsa.PublicKey, pri *rsa.PrivateKey) Request_Msg {
@@ -26,12 +26,12 @@ type preprepare struct {
 }
 
 /**
-
- */
+江声：用匿名成员代替了之前的preprepare preprepare，感觉这样更加清晰一点
+*/
 type Prepreprare_Msg struct {
-	preprepare preprepare //preprepare本身
-	request    request    //request本身
-	signature  []byte     //签名
+	preprepare        //preprepare本身
+	request           //request本身
+	signature  []byte //签名
 }
 
 /**
@@ -51,8 +51,8 @@ type prepare struct {
 }
 
 type Prepare_Msg struct {
-	prepare   prepare //prepare本身
-	signature []byte  //签名
+	prepare          //prepare本身
+	signature []byte //签名
 }
 
 func NewPrepare(n, v, i int32, d []byte, pri *rsa.PrivateKey) Prepare_Msg {
@@ -74,7 +74,7 @@ type commit struct {
 }
 
 type Commit_Msg struct {
-	commit    commit //commit本身
+	commit           //commit本身
 	siganture []byte //签名
 }
 

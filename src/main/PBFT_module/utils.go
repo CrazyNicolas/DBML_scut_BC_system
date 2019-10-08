@@ -1,7 +1,15 @@
 package PBFT_module
 
-import "strconv"
+import (
+	"encoding/json"
+	"strconv"
+)
 
+/**
+江声
+该函数用来将任意类型转换为string类型
+TODO 还有一些其他类型有待处理
+*/
 func ToString(args interface{}) string {
 	switch args.(type) {
 	case int:
@@ -14,6 +22,24 @@ func ToString(args interface{}) string {
 		return strconv.FormatInt(int64(args.(int32)), 10)
 	case int64:
 		return strconv.FormatInt(int64(args.(int64)), 10)
+	default:
+		bytes, _ := json.Marshal(args)
+		return string(bytes)
 	}
-	return ""
+}
+
+/**
+江声
+该函数用来判断两个byte数组是否相等，可用于校验数字签名
+*/
+func BytesEqual(b1, b2 []byte) bool {
+	if len(b1) != len(b2) {
+		return false
+	}
+	for i := 0; i < len(b1); i++ {
+		if b1[i] != b2[i] {
+			return false
+		}
+	}
+	return true
 }

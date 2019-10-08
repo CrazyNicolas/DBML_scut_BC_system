@@ -19,9 +19,12 @@ import (
 
 */
 
+/**
+主节点结构，继承replica
+*/
 type Primary struct {
 	Replica
-	n int32
+	n int32 //分配的序号n
 }
 
 /**
@@ -29,6 +32,7 @@ type Primary struct {
 */
 func (pri *Primary) Get_Request(ctx context.Context, args Request_Msg, reply interface{}) error {
 	// TODO 对客户端的请求进行校验
+
 	return nil
 }
 
@@ -43,6 +47,7 @@ func (pri *Primary) Get_Request(ctx context.Context, args Request_Msg, reply int
 */
 func (t *Primary) Primary_Get_Prepare(ctx context.Context, args *Prepare_Msg, reply *interface{}) error {
 	// TODO 这里面写处理Prepare()的逻辑，如果正确的话执行commit()
+
 	return nil
 }
 
