@@ -73,6 +73,17 @@ func GetPublicKey(path string) *rsa.PublicKey {
 	return publickey
 }
 
+//这个方法是节点的成员方法，用来根据具体的节点来获取私钥，比GetPrivateKey好用
+//TODO 节点的密钥对存储方式有待确定
+func (rep *Replica) GetPrivateKey() *rsa.PrivateKey {
+	return nil
+}
+
+//TODO 获取节点公钥
+func (rep *Replica) GetPublicKey() *rsa.PublicKey {
+	return nil
+}
+
 func DigitalSignature(message interface{}, privatekey *rsa.PrivateKey) []byte {
 	//从密钥文件里面把私钥拿到
 
@@ -80,8 +91,8 @@ func DigitalSignature(message interface{}, privatekey *rsa.PrivateKey) []byte {
 	//hash.Write(message)
 	//digest := hash.Sum(nil)
 
+	//生成message的消息摘要
 	digest := Digest(message)
-
 	digital_signature, err := rsa.SignPKCS1v15(rand.Reader, privatekey, crypto.SHA256, digest)
 	if err != nil {
 		fmt.Println("Signing err: ", err)
@@ -98,13 +109,18 @@ func Digest(message interface{}) []byte {
 	return digest
 }
 
-func Verify_ds(signature []byte, path string, message []byte) bool {
-	publickey := GetPublicKey(path)
+/**
+江声
+修改了参数定义，siganature是该消息的数字签名，pub为发送者的公钥，message为任意类型的消息
+*/
+func Verify_ds(signature []byte, pub *rsa.PublicKey, message interface{}) bool {
 	hash := sha256.New()
-	hash.Write(message)
+	//把message序列化
+	data, _ := json.Marshal(message)
+	hash.Write(data)
 	//生成摘要待查验
 	digest := hash.Sum(nil)
 	//将摘要和数字签名公钥解析后的对比
-	err := rsa.VerifyPKCS1v15(publickey, crypto.SHA256, digest, signature)
+	err := rsa.VerifyPKCS1v15(pub, crypto.SHA256, digest, signature)
 	return err == nil
 }

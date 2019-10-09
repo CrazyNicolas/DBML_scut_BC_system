@@ -1,5 +1,10 @@
 package PBFT_module
 
+import (
+	"context"
+	"crypto/rsa"
+)
+
 /**
  client 有以下几个流程：
 	1.首先调用Request() 向 primary发起请求
@@ -18,7 +23,7 @@ type Client struct {
 
 func Request(operation string, pub *rsa.PublicKey, pri *rsa.PrivateKey) {
 	// TODO 这里应该首先获得主节点的地址，并调用它的那个接收函数
-	msg := NewRequest(operation, time.Now().UnixNano(), pub, pri)
+	//msg := NewRequest(operation, time.Now().UnixNano(), pub, pri)
 	/**
 	此部分要求获得主节点的地址，并要求广播调用其getRequest（）方法
 	1.首先要求从数据库里取出类似的Reply（）消息（即为看有没有n，v，r消息）
@@ -26,7 +31,6 @@ func Request(operation string, pub *rsa.PublicKey, pri *rsa.PrivateKey) {
 	*/
 
 }
-
 
 /**
 4. 接受从其他节点发来的Commit（）参数（即为远程服务）
@@ -49,4 +53,3 @@ func (t *Client) Get_Reply(ctx context.Context, args Reply_Msg, reply *interface
 
 func main() {
 }
-

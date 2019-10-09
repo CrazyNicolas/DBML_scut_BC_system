@@ -1,6 +1,7 @@
 package PBFT_module
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -27,6 +28,11 @@ type Replica struct {
 	h            int32
 	H            int32
 }
+
+/**
+江声 全局变量f表示拜占庭节点数
+*/
+var f = 1
 
 /**
 江声：
@@ -63,17 +69,17 @@ func NewReplica(i, v, h, H int32) Replica {
 	}
 
 	//TODO: 广播prepare消息
-	return nil
+	//return nil
 }
 
 /**
 2. prepare()方法
 */
-func (rep *Replica) Prepare(n int32, digest []byte, private *rsa.PrivateKey) {
-	args := NewPrepare(n, rep.viewNumber, rep.serialNumber, digest, private)
-	// TODO 这里要广播所有节点发送prepare的参数
-	//TODO 记录到log
-}
+//func (rep *Replica) Prepare(n int32, digest []byte, private *rsa.PrivateKey) {
+//	args := NewPrepare(n, rep.viewNumber, rep.serialNumber, digest, private)
+//	// TODO 这里要广播所有节点发送prepare的参数
+//	//TODO 记录到log
+//}
 
 /**
 3. 接受从其他Replica发来的prepare（）参数（即为远程服务）
@@ -89,20 +95,20 @@ func (t *Replica) Replica_Get_Prepare(ctx context.Context, args *Prepare_Msg, re
 /**
 4. Commit()方法
 */
-func (rep *Replica) Commit(n int32, digest []byte, private *rsa.PrivateKey) {
-	// TODO 这里要根据Commit_Args的参数来指定具体参数
-	// TODO 这里要广播所有节点发送commit的参数
-	args := NewCommit(n, rep.viewNumber, rep.serialNumber, digest, private)
-}
+//func (rep *Replica) Commit(n int32, digest []byte, private *rsa.PrivateKey) {
+//	// TODO 这里要根据Commit_Args的参数来指定具体参数
+//	// TODO 这里要广播所有节点发送commit的参数
+//	args := NewCommit(n, rep.viewNumber, rep.serialNumber, digest, private)
+//}
 
 /**
 5. 接受从其他节点发来的Commit（）参数（即为远程服务）
 */
-func (t *Replica) Replica_Get_Commit(ctx context.Context, args *Commit_Msg, reply *interface{}) error {
-	// TODO 这里面写处理Commit()的逻辑，如果正确的话执行Reply()
-	return nil
-
-}
+//func (t *Replica) Replica_Get_Commit(ctx context.Context, args *Commit_Msg, reply *interface{}) error {
+//	// TODO 这里面写处理Commit()的逻辑，如果正确的话执行Reply()
+//	return nil
+//
+//}
 
 ///**
 //1. 接受从Primary来的pre-prepare()参数（即为远程服务）

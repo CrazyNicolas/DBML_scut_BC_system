@@ -42,7 +42,6 @@ type preprepare struct {
 	digest []byte //消息摘要d
 }
 
-
 /**
 江声：用匿名成员代替了之前的preprepare preprepare，感觉这样更加清晰一点
 =======
@@ -59,15 +58,14 @@ type Prepreprare_Msg struct {
 /**
 
  */
-func NewPreprepare(v, n int32, req request, pri *rsa.PrivateKey) Prepreprare_Msg {
-	prepre := preprepare{v, n, Digest(req)}
 
 /*
 	新发起一个Preprepare—Msg（）请求的方法
+	参数n, v 为主节点分配的序列号，视图号，request为客户端发来的request请求，pri为主节点的私钥
 */
 func NewPreprepare(n, v int32, req request, pri *rsa.PrivateKey) Prepreprare_Msg {
 	prepre := preprepare{n, v, Digest(req)}
-
+	//仅对Preprepare消息进行签名
 	sig := DigitalSignature(prepre, pri)
 	return Prepreprare_Msg{prepre, req, sig}
 }
