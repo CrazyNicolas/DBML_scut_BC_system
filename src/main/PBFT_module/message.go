@@ -1,4 +1,4 @@
-package main
+package PBFT_module
 
 import "crypto/rsa"
 
@@ -20,8 +20,8 @@ type request struct {
 	远程调用getRequest方法所发送和接收的参数
 */
 type Request_Msg struct {
-	request   request //request本身
-	signature []byte  //签名
+	request          //request本身
+	signature []byte //签名
 }
 
 /*
@@ -37,25 +37,37 @@ func NewRequest(op string, t int64, pub *rsa.PublicKey, pri *rsa.PrivateKey) Req
 	preprepare中信息的一部分，也就是需要用私钥加密的一部分
 */
 type preprepare struct {
-	n      int32  //主节点分配的序号n
 	v      int32  //视图编号v
+	n      int32  //主节点分配的序号n
 	digest []byte //消息摘要d
 }
 
+
+/**
+江声：用匿名成员代替了之前的preprepare preprepare，感觉这样更加清晰一点
+=======
 /*
 	Pre-prepare（）消息体结构，也就是调用getPreprepare（）方法所发送和接收的参数
+
 */
 type Prepreprare_Msg struct {
-	preprepare preprepare //preprepare本身
-	request    request    //request本身
-	signature  []byte     //签名
+	preprepare        //preprepare本身
+	request           //request本身
+	signature  []byte //签名
 }
+
+/**
+
+ */
+func NewPreprepare(v, n int32, req request, pri *rsa.PrivateKey) Prepreprare_Msg {
+	prepre := preprepare{v, n, Digest(req)}
 
 /*
 	新发起一个Preprepare—Msg（）请求的方法
 */
 func NewPreprepare(n, v int32, req request, pri *rsa.PrivateKey) Prepreprare_Msg {
 	prepre := preprepare{n, v, Digest(req)}
+
 	sig := DigitalSignature(prepre, pri)
 	return Prepreprare_Msg{prepre, req, sig}
 }
@@ -74,8 +86,8 @@ type prepare struct {
 	Prepare（）消息体结构，也就是调用getPrepare（）方法所发送和接收的参数
 */
 type Prepare_Msg struct {
-	prepare   prepare //prepare本身
-	signature []byte  //签名
+	prepare          //prepare本身
+	signature []byte //签名
 }
 
 /*
@@ -106,7 +118,7 @@ type commit struct {
 	Commit消息体结构，也就是调用getCommit（）方法所发送和接收的参数
 */
 type Commit_Msg struct {
-	commit    commit //commit本身
+	commit           //commit本身
 	siganture []byte //签名
 }
 
