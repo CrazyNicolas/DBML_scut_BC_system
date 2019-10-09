@@ -146,6 +146,7 @@ func (rep *Replica) checkPrepared(n int32) (bool, *request) {
 		json.Unmarshal([]byte(m), msg)
 		return true, &msg
 	}
+	return false, nil
 }
 
 /*
