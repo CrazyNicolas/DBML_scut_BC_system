@@ -59,7 +59,7 @@ func (pri *Primary) Pre_prepare(request Request_Msg, private *rsa.PrivateKey) {
 	args := NewPreprepare(pri.n, pri.viewNumber, request.request, private)
 	pri.n++ //分配好一个request消息后n要增加
 	//TODO rpxc调用，向其他节点广播
-
+	fmt.Println(args)
 }
 
 /**
@@ -87,7 +87,11 @@ func (pri *Primary) Primary_Get_Prepare(ctx context.Context, args *Prepare_Msg, 
 	pri.log(args)
 
 	//TODO 判断prepare阶段是否已经完成，若完成则广播commit
-	ok, req := pri.checkPrepared(pri.n)
+	ok, _ := pri.checkPrepared(pri.n)
+	if ok {
+		//TODO 广播commit
+
+	}
 
 	return nil
 }
@@ -156,7 +160,7 @@ func (rep *Primary) Commit(n int32, digest []byte, private *rsa.PrivateKey) {
 	// TODO 这里要根据Commit_Args的参数来指定具体参数
 	// TODO 这里要广播所有节点发送commit的参数
 	args := NewCommit(n, rep.viewNumber, rep.serialNumber, digest, private)
-	println(args)
+	fmt.Println(args)
 }
 
 /**
