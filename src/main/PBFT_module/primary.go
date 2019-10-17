@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"sync"
 )
 
 /**
@@ -33,18 +34,74 @@ type Primary struct {
 
 /**
 1. 接受从client来的Request请求的参数（即为远程服务）
+@author:江声
+加入了管道化技术，requestRelayStream用于转发请求
 */
+var requestRelayStream = make(chan interface{}, 10)
+
 func (pri *Primary) Get_Request(ctx context.Context, args Request_Msg, reply interface{}) error {
 	//要拿到客户端的公钥，否则无法验证，这里暂时使用Request_Msg消息内部的publickKey属性
-	publickKey := args.publicKey
-
+	publicKey := args.publicKey
 	//主节点的私钥,暂时用private.pem
 	privateKey := GetPrivateKey("private.pem")
-	if !Verify_ds(args.signature, publickKey, args.request) {
-		fmt.Println("request客户端校验不通过")
-	} else {
-		pri.Pre_prepare(args, privateKey)
+
+	//类型断言管道
+	ToRequest := func(done <-chan interface{}, values <-chan interface{}) <-chan Request_Msg {
+		reqStream := make(chan Request_Msg)
+		go func() {
+			defer close(reqStream)
+			for v := range values {
+				select {
+				case <-done:
+					return
+				case reqStream <- v.(Request_Msg):
+				}
+			}
+		}()
+		return reqStream
 	}
+
+	//验证(process)管道
+	validation := func(done <-chan interface{}, values <-chan Request_Msg) <-chan Request_Msg {
+		stream := make(chan Request_Msg)
+		go func() {
+			defer close(stream)
+			for v := range stream {
+				if Verify_ds(v.signature, publicKey, v.request) {
+					stream <- v
+				}
+			}
+		}()
+		return stream
+	}
+
+	fan_in := func(done <-chan interface{}, channels ...chan Request_Msg) <-chan Request_Msg {
+		resultStream := make(chan Request_Msg)
+		var wg sync.WaitGroup
+		wg.Add(len(channels))
+
+		doWork := func(c <-chan Request_Msg) {
+			defer wg.Done()
+			for v := range c {
+				select {
+				case <-done:
+					return
+				case resultStream <- v:
+				}
+			}
+		}
+
+		for _, c := range channels {
+			go doWork(c)
+		}
+
+		go func() {
+			wg.Wait()
+			close(resultStream)
+		}()
+		return resultStream
+	}
+
 	return nil
 }
 

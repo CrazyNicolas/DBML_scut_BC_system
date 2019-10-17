@@ -23,6 +23,9 @@ import (
  还需要有针对各种方法建立一些结构体 相应的要有args
 */
 
+/**
+Replica应该是一个服务
+*/
 type Replica struct {
 	serialNumber int32
 	viewNumber   int32
