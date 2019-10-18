@@ -34,10 +34,12 @@ var relayStream = make(chan interface{}, 10)
 //定义rpcx服务
 type Service struct {
 }
+
 type Args struct {
 	Info int
 	Addr string
 }
+
 type Reply struct {
 	Response bool
 }

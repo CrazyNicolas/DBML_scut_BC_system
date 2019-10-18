@@ -17,6 +17,7 @@ type Args struct {
 	Info int
 	Addr string
 }
+
 type Reply struct {
 	Response bool
 }

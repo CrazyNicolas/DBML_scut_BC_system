@@ -41,6 +41,39 @@ func GenerateRsaKeyPair(bits int) {
 	pem.Encode(publicKeyFile, &publicKeyBlock)
 }
 
+/**
+@author: js
+该方法用来生成密钥对并存进文件，与前一个方法不同的是可以指定节点号i，将密钥存进replicai文件中，密钥文件全部放在keys文件夹下
+*/
+func GenerateKeyPairAndSave(bits int, i int32) {
+	privateKey, err := rsa.GenerateKey(rand.Reader, bits)
+	if err != nil {
+		fmt.Println("GenerateKey err : ", err)
+	}
+	x509PrivateKey := x509.MarshalPKCS1PrivateKey(privateKey)
+	//新建一个私钥文件
+	privateKeyFile, err := os.Create("keys/replica" + ToString(i) + "_private.pem")
+	if err != nil {
+		fmt.Println("CreateFile err: ", err)
+	}
+	defer privateKeyFile.Close()
+	privateKeyBlock := pem.Block{Type: "RSA Private Key", Bytes: x509PrivateKey}
+	//将块编码进文件
+	pem.Encode(privateKeyFile, &privateKeyBlock)
+
+	publicKey := privateKey.PublicKey
+	x509PublicKey := x509.MarshalPKCS1PublicKey(&publicKey)
+	//新建一个公钥文件
+	publicKeyFile, err := os.Create("keys/replica" + ToString(i) + "_public.pem")
+	if err != nil {
+		fmt.Println("CreateFile err:", err)
+	}
+	defer publicKeyFile.Close()
+	publicKeyBlock := pem.Block{Type: "RSA Public Key", Bytes: x509PublicKey}
+	//将公钥的编码写进文件
+	pem.Encode(publicKeyFile, &publicKeyBlock)
+}
+
 func GetPrivateKey(path string) *rsa.PrivateKey {
 	file, err := os.Open(path)
 	if err != nil {

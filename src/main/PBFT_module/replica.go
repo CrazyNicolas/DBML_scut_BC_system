@@ -23,6 +23,9 @@ import (
  还需要有针对各种方法建立一些结构体 相应的要有args
 */
 
+/**
+Replica应该是一个服务
+*/
 type Replica struct {
 	serialNumber int32
 	viewNumber   int32
@@ -38,6 +41,7 @@ var f = 1
 /**
 江声：
 创建一个replica对象，并且判断数据库中是否存在他的日志，如果没有则创建，表的命名为replica i
+而且，需要在数据库中生成密钥对
 */
 
 func NewReplica(i, v, h, H int32) Replica {
@@ -62,6 +66,13 @@ func NewReplica(i, v, h, H int32) Replica {
 			fmt.Println("数据表创建失败", err)
 		}
 	}
+
+	//判断数据库中是否存在节点i的密钥对，若没有则生成
+	rows, err = db.Query("select * from information_schema.tables where table_name = 'key'" + ToString(i))
+	if err != nil {
+		fmt.Println("查询information_schema出错", err)
+	}
+
 	return Replica{
 		serialNumber: i,
 		viewNumber:   v,
